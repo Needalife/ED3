@@ -1,49 +1,33 @@
-#include "esp_camera.h"
 #include <WiFi.h>
+#include <esp_camera.h>
 #include <ESPAsyncWebServer.h>
-#include <ESPmDNS.h>
 
-// Wi-Fi Credentials
-const char* ssid = "BinBem 5Ghz";
-const char* password = "12022007";
+// Replace with your network credentials
+const char* ssid = "NK (2)";
+const char* password = "12345678";
 
-// Camera Pins (AI Thinker Module)
-#define PWDN_GPIO_NUM    32
-#define RESET_GPIO_NUM   -1
-#define XCLK_GPIO_NUM      0
-#define SIOD_GPIO_NUM     26
-#define SIOC_GPIO_NUM     27
-
-#define Y9_GPIO_NUM       35
-#define Y8_GPIO_NUM       34
-#define Y7_GPIO_NUM       39
-#define Y6_GPIO_NUM       36
-#define Y5_GPIO_NUM       21
-#define Y4_GPIO_NUM       19
-#define Y3_GPIO_NUM        18
-#define Y2_GPIO_NUM         5
-#define VSYNC_GPIO_NUM    25
-#define HREF_GPIO_NUM     23
-#define PCLK_GPIO_NUM     22
-
+// Create an AsyncWebServer object on port 80
 AsyncWebServer server(80);
 
-// HTML Page for Video Stream
-const char* stream_html = R"rawliteral(
-<!DOCTYPE html>
-<html>
-<head>
-    <title>ESP32-CAM Video Stream</title>
-</head>
-<body>
-    <h1>ESP32-CAM Video Stream</h1>
-    <img src="/stream" width="640" height="480" />
-</body>
-</html>
-)rawliteral";
+// Camera pin configuration
+#define PWDN_GPIO_NUM    -1
+#define RESET_GPIO_NUM   -1
+#define XCLK_GPIO_NUM    0
+#define SIOD_GPIO_NUM    26
+#define SIOC_GPIO_NUM    27
+#define Y9_GPIO_NUM      35
+#define Y8_GPIO_NUM      34
+#define Y7_GPIO_NUM      39
+#define Y6_GPIO_NUM      36
+#define Y5_GPIO_NUM      21
+#define Y4_GPIO_NUM      19
+#define Y3_GPIO_NUM      18
+#define Y2_GPIO_NUM      5
+#define VSYNC_GPIO_NUM   25
+#define HREF_GPIO_NUM    23
+#define PCLK_GPIO_NUM    22
 
-// Function to initialize the camera
-bool initCamera(){
+void startCamera() {
     camera_config_t config;
     config.ledc_channel = LEDC_CHANNEL_0;
     config.ledc_timer = LEDC_TIMER_0;
@@ -79,78 +63,36 @@ bool initCamera(){
 
     // Camera init
     esp_err_t err = esp_camera_init(&config);
-    if (err != ESP_OK){
+    if (err != ESP_OK) {
         Serial.printf("Camera init failed with error 0x%x", err);
-        return false;
-    }
-    return true;
-}
-
-// Handle root page
-void handleRoot(AsyncWebServerRequest *request){
-    request->send_P(200, "text/html", stream_html);
-}
-
-// Handle stream
-void handleStream(AsyncWebServerRequest *request){
-    AsyncResponseStream *response = request->beginResponseStream("multipart/x-mixed-replace; boundary=frame");
-    request->send(response);
-    while(1){
-        camera_fb_t * fb = esp_camera_fb_get();
-        if(!fb){
-            Serial.println("Camera capture failed");
-            return;
-        }
-        response->print("--frame\r\n");
-        response->print("Content-Type: image/jpeg\r\n\r\n");
-        response->write(fb->buf, fb->len);
-        response->print("\r\n");
-        esp_camera_fb_return(fb);
-
-        // Small delay to control frame rate
-        delay(100);
+        return;
     }
 }
 
-void setup(){
-    // Initialize Serial Monitor
+void setup() {
+    // Start serial communication
     Serial.begin(115200);
-    delay(1000);
-    Serial.println("AI Thinker ESP32-CAM Video Stream");
-
-    // Initialize Camera
-    if(!initCamera()){
-        Serial.println("Camera initialization failed!");
-        while(1);
-    }
-    Serial.println("Camera initialized.");
 
     // Connect to Wi-Fi
     WiFi.begin(ssid, password);
-    Serial.print("Connecting to WiFi");
-    while (WiFi.status() != WL_CONNECTED){
-        delay(500);
-        Serial.print(".");
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(1000);
+        Serial.println("Connecting to WiFi...");
     }
-    Serial.println("");
-    Serial.println("WiFi Connected");
-    Serial.print("IP Address: ");
-    Serial.println(WiFi.localIP());
+    Serial.println("Connected to WiFi");
 
-    // Start mDNS (Optional: For hostname access)
-    if (!MDNS.begin("esp32cam")) {
-        Serial.println("Error setting up MDNS responder!");
-    }
-    Serial.println("mDNS responder started. Access via esp32cam.local");
+    // Start camera
+    startCamera();
 
-    // Initialize Web Server Routes
-    server.on("/", HTTP_GET, handleRoot);
-    server.on("/stream", HTTP_GET, handleStream);
+    // Route for video streaming
+    server.on("/stream", HTTP_GET, [](AsyncWebServerRequest *request){
+        request->send_P(200, "text/html", "<html>Stream content here</html>");
+    });
 
-    // Start Server
+    // Start server
     server.begin();
 }
 
-void loop(){
-    // Nothing needed here
+void loop() {
+    // Nothing to do here
 }

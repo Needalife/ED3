@@ -4,8 +4,8 @@
 #include <ESPmDNS.h>
 
 // Wi-Fi Credentials
-const char* ssid = "BinBem 5Ghz";
-const char* password = "12022007";
+const char* ssid = "NK (2)";
+const char* password = "12345678";
 
 // Motor Control Pins
 // Front-Left Motor
