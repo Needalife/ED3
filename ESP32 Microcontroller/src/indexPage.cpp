@@ -5,7 +5,7 @@ String getIndexPage() {
     <!DOCTYPE html>
     <html>
     <head>
-        <title>Robot Control</title>
+        <title>Controller</title>
         <style>
             #joystick-container {
                 width: 300px;
@@ -37,7 +37,7 @@ String getIndexPage() {
         </style>
     </head>
     <body>
-        <h1>Robot Control</h1>
+        <h1>Mecanum Wheelchair</h1>
         <img id="camera-stream" src="http://<ESP32-CAM-IP>:81/stream" alt="Camera Stream">
         <div id="joystick-container">
             <div id="joystick"></div>
