@@ -124,6 +124,7 @@ void setup() {
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
         Serial.print(".");
+        Serial.println(WiFi.status());
     }
     Serial.println("");
     Serial.println("WiFi Connected");
@@ -133,7 +134,7 @@ void setup() {
     // Initialize mDNS
     if (!MDNS.begin("esp32wroom")) {
         Serial.println("Error setting up mDNS responder!");
-    }
+    
     Serial.println("mDNS responder started. Access via esp32wroom.local");
 
     // Initialize Web Server Routes
