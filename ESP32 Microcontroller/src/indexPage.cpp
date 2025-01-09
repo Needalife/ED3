@@ -12,8 +12,10 @@ String getIndexPage() {
                 height: 300px;
                 background-color: #f0f0f0;
                 border-radius: 50%;
-                position: relative;
-                margin: auto;
+                position: fixed; /* Make it fixed so it stays at the bottom */
+                bottom: 20px; /* Distance from the bottom of the page */
+                left: 50%; /* Center it horizontally */
+                transform: translateX(-50%); /* Adjust horizontal alignment */
             }
             #joystick {
                 width: 100px;
