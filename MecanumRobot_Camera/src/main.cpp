@@ -5,12 +5,8 @@
 #include <WebSocketsServer.h>  // Add this new include
 
 // Replace with your network credentials
-const char* ssid = "NK (2)";
-const char* password = "12345678";
-
-// Add authentication credentials
-const char* wsUsername = "admin";
-const char* wsPassword = "admin123";
+const char* ssid = "baotrung";
+const char* password = "vy952003";
 
 // Create an AsyncWebServer object on port 80
 AsyncWebServer server(80);
@@ -113,32 +109,12 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
         case WStype_CONNECTED:
             {
                 Serial.printf("[%u] Connection from: %s\n", num, webSocket.remoteIP(num).toString().c_str());
-                clientConnected = false;  // Wait for auth
+                clientConnected = true;  // Accept connection immediately
             }
             break;
             
         case WStype_TEXT:
-            {
-                String message = String((char*)payload);
-                if (message.startsWith("AUTH:")) {
-                    // Parse username:password
-                    String auth = message.substring(5);
-                    int separator = auth.indexOf(':');
-                    if (separator > 0) {
-                        String username = auth.substring(0, separator);
-                        String password = auth.substring(separator + 1);
-                        
-                        if (username == wsUsername && password == wsPassword) {
-                            clientConnected = true;
-                            webSocket.sendTXT(num, "AUTH_OK");
-                            Serial.printf("[%u] Authentication successful\n", num);
-                        } else {
-                            webSocket.sendTXT(num, "AUTH_FAILED");
-                            Serial.printf("[%u] Authentication failed\n", num);
-                        }
-                    }
-                }
-            }
+            // Remove authentication handling
             break;
     }
 }
@@ -192,7 +168,7 @@ void setup() {
     // Start WebSocket server
     webSocket.begin();
     webSocket.onEvent(webSocketEvent);
-    Serial.printf("WebSocket server started on port 81 (Username: %s, Password: %s)\n", wsUsername, wsPassword);
+    Serial.println("WebSocket server started on port 81");
     
     server.begin();
     Serial.println("HTTP server started");
